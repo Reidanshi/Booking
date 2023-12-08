@@ -51,11 +51,11 @@ class Room(models.Model):
 
 # Booking: id, user_id, room_id, check_in_date, check_out_date, created_at,
 # updated_at, deleted_at, deleted
-class Review(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
-    comment = models.TextField()
-    rating = models.FloatField()
+class Booking(models.Model):
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    room_id = models.ForeignKey(Room, on_delete=models.CASCADE)
+    check_in_date = models.DateField()
+    check_out_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
@@ -65,8 +65,8 @@ class Review(models.Model):
 # Review: id, user_id, hotel_id, comment, rating, created_at,
 # updated_at, deleted_at, deleted
 class Review(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    hotel_id = models.ForeignKey(Hotel, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
     comment = models.TextField()
     rating = models.FloatField()
     created_at = models.DateTimeField(auto_now_add=True)
