@@ -1,12 +1,21 @@
 from django.shortcuts import render
 
 def home(request):
-    return render(request, 'main/main.html')
+    date = {
+        'title': 'Roch Hotels Official Site',
+    }
+    return render(request, 'main/main.html', date)
 
 
 def about(request):
-    return render(request, 'main/about.html')
+    about = {
+        'about': 'Roch Hotels|Info',
+    }
+    return render(request, 'main/about.html', about)
 
 
 def hotels(request):
-    return render(request, 'main/hotels.html')
+    hotels = {
+        'hotels': 'Roch Hotels|Hotels'
+    }
+    return render(request, 'main/hotels.html', hotels)
