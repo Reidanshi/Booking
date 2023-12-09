@@ -18,6 +18,10 @@ class Hotel(models.Model):
     def __str__(self):
         return self.name
 
+
+    def get_absolute_url(self):
+        return f'/hotels/{self.id}'
+
 # Room: id, hotel_id, room_type, photos, price_per_night, available
 # created_at, updated_at, deleted_at, deleted
 class Room(models.Model):

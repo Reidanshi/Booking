@@ -10,6 +10,7 @@
                 <div class="alert alert-danger">
                     <h3>{{ el.name }}</h3>
                     <p>{{ el.location }}</p>
+                    <a href="{% url 'hotel-detail' el.id %}" class="btn btn-info">Подробное описание</a>
                 </div>
             {% endfor %}
         {% else %}

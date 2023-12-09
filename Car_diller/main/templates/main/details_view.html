@@ -1,0 +1,15 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}{{ hotels.name }}{% endblock %}
+
+{% block content %}
+    <div class="features">
+        <h1>{{ hotels.name }}</h1>
+        <p>{{ hotels.rating }}</p>
+        <p>{{ hotels.description }}</p>
+        <a href="{% url 'hotel-delete' hotels.id %}" class="btn btn-danger">Удалить отель</a>
+        <a href="{% url 'hotel-update' hotels.id %}" class="btn btn-info">Обновить отель</a>
+    </div>
+{% endblock %}
+
+
