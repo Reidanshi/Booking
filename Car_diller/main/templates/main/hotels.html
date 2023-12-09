@@ -1,12 +1,20 @@
 {% extends 'main/layout.html' %}
 
-{% block title %}{{ hotels }}{% endblock %}
+{% block title %}Список отелей{% endblock %}
 
 {% block content %}
     <div class="features">
-        <h1>{{ hotels }}</h1>
-        <p>lore ipsum</p>
-        <button class="btn btn-warning">Выбрать отель</button>
+        <h1>Список отелей</h1>
+        {% if hotels %}
+            {% for el in hotels %}
+                <div class="alert alert-danger">
+                    <h3>{{ el.name }}</h3>
+                    <p>{{ el.location }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>К сожелению, отелей в выбраном вами месте, пока что нету, либо они еще не зарегистрированы у нас в приложении</p>
+        {% endif %}
     </div>
 {% endblock %}
 

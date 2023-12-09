@@ -42,7 +42,6 @@ INSTALLED_APPS = [
 
 INSTALLED_APPS += [
     'main',
-    'hotel',
 ]
 
 
