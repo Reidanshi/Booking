@@ -1,0 +1,21 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Список свободных комнат{% endblock %}
+
+{% block content %}
+    <div class="features">
+        <h1>Список свободных комнат</h1>
+        {% if rooms %}
+            {% for el in rooms %}
+                <div class="alert alert-danger">
+                    <h3>{{ el.room_type }}</h3>
+                    <a href="{% url 'rooms-detail' el.id %}" class="btn btn-info">Подробное описание</a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>К сожелению свободных комнат нет</p>
+        {% endif %}
+    </div>
+{% endblock %}
+
+

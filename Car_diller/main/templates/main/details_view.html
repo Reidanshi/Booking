@@ -5,10 +5,10 @@
 {% block content %}
     <div class="features">
         <h1>{{ hotels.name }}</h1>
+        <p>{{ hotels.photo }}</p>
         <p>{{ hotels.rating }}</p>
         <p>{{ hotels.description }}</p>
-        <a href="{% url 'hotel-delete' hotels.id %}" class="btn btn-danger">Удалить отель</a>
-        <a href="{% url 'hotel-update' hotels.id %}" class="btn btn-info">Обновить отель</a>
+        <a href="{% url 'room-list' pk=hotels.id %}" class="btn btn-info">Свободные комнаты</a>
     </div>
 {% endblock %}
 

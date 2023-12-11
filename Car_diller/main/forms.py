@@ -1,5 +1,5 @@
 from django.forms import ModelForm, TextInput, Textarea, NumberInput
-from .models import Hotel
+from .models import Hotel, Room
 
 class HotelForm(ModelForm):
     class Meta:
@@ -24,3 +24,10 @@ class HotelForm(ModelForm):
                 'placeholder': 'Рейтинг'
             })
         }
+
+
+
+class RoomForm(ModelForm):
+    class Meta:
+        model = Room
+        fields = '__all__'

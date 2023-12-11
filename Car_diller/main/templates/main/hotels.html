@@ -11,10 +11,11 @@
                     <h3>{{ el.name }}</h3>
                     <p>{{ el.location }}</p>
                     <a href="{% url 'hotel-detail' el.id %}" class="btn btn-info">Подробное описание</a>
+                    <a href="{% url 'room-list' pk=el.id %}" class="btn btn-info">Комнаты</a>
                 </div>
             {% endfor %}
         {% else %}
-            <p>К сожелению, отелей в выбраном вами месте, пока что нету, либо они еще не зарегистрированы у нас в приложении</p>
+            <p>К сожелению отелей нет</p>
         {% endif %}
     </div>
 {% endblock %}
