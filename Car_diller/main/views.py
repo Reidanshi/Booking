@@ -1,11 +1,7 @@
-from django.views.generic import UpdateView, DetailView, DeleteView
+from django.views.generic import DetailView, ListView
 from django.shortcuts import render, redirect
-from rest_framework import viewsets
 from .models import Hotel, Room
-from .serializers import HotelSerializer, RoomSerializer
-from rest_framework.generics import ListAPIView
-from django.views import View
-from .forms import HotelForm, RoomForm
+from .forms import HotelForm
 
 
 
@@ -21,34 +17,39 @@ class HotelDetailView(DetailView):
     context_object_name = 'hotels'
 
 
-# class HotelUpdateView(UpdateView):
-#     model = Hotel
-#     template_name = 'main/create.html'
-#     form_class = HotelForm
+def room_list(request, hotel_id):
+    hotel = Hotel.objects.get(pk=hotel_id)
+    rooms = Room.objects.filter(hotel=hotel, available=True)
+    return render(request, 'main/room_list.html', {'hotel': hotel, 'rooms': rooms})
 
-# class HotelDeleteView(DeleteView):
-#     model = Hotel
-#     success_url = '/hotels/'
-#     template_name = 'main/hotels_delete.html'
-
-
-def rooms(request):
-    rooms= Room.objects.all()
-    return render(request, 'main/room_list.html')
-
-class RoomListView(DetailView):
+class RoomListView(ListView):
     model = Room
-    success_url = '/rooms/'
     template_name = 'main/room_list.html'
+    context_object_name = 'rooms'
+
+    def get_queryset(self):
+        return Room.objects.filter(available=True)
 
 class RoomDetailView(DetailView):
     model = Room
     template_name = 'main/rooms_detail_view.html'
     context_object_name = 'room'
 
-# class RoomViewSet(viewsets.ModelViewSet):
-#     queryset = Room.objects.all()
-#     serializer_class = RoomSerializer
+    def get_object(self, queryset=None):
+        hotel_id = self.kwargs['pk']
+        room_id = self.kwargs['room_id']
+        return Room.objects.get(hotel_id=hotel_id, id=room_id)
+
+class RoomListView(DetailView):
+    model = Room
+    template_name = 'main/room_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        hotel_id = self.kwargs['pk']
+        context['rooms'] = Room.objects.filter(hotel_id=hotel_id)
+        context['hotel'] = Hotel.objects.get(id=hotel_id)
+        return context
 
 
 def about(request):
@@ -81,84 +82,3 @@ def create(request):
     }
 
     return render(request, 'main/create.html', data)
-#
-
-
-# class HotelViewSet(viewsets.ModelViewSet):
-#     queryset = Hotel.objects.all()
-#     serializer_class = HotelSerializer
-
-
-
-
-
-# class ManageHotelView(View):
-#     def get(self, request, *args, **kwargs):
-#         hotels = Hotel.objects.all()
-#         form = HotelForm()
-#         return render(request, 'manage_hotel.html', {'hotels': hotels, 'form': form})
-#
-#     def post(self, request, *args, **kwargs):
-#         form = HotelForm(request.POST)
-#         if form.is_valid():
-#             hotel_id = request.POST.get('hotel_id')
-#             if hotel_id:
-#                 hotel = Hotel.objects.get(id=hotel_id)
-#                 form = HotelForm(request.POST, instance=hotel)
-#             else:
-#                 form.save()
-#         return redirect('manage-hotel')
-#
-#     def get(self, request, *args, **kwargs):
-#         hotel_id = request.GET.get('hotel_id')
-#         if hotel_id:
-#             Hotel.objects.get(id=hotel_id).delete()
-#         return redirect('manage-hotel')
-#
-#
-# class RoomListAPIView(ListAPIView):
-#     queryset = Room.objects.all()
-#     serializer_class = RoomSerializer
-#
-# class HotelListAPIView(ListAPIView):
-#     queryset = Hotel.objects.all()
-#     serializer_class = HotelSerializer
-#
-#
-# class ManageHotelView(View):
-#     def get(self, request, *args, **kwargs):
-#         hotels = Hotel.objects.all()
-#         form = HotelForm()
-#         return render(request, 'manage_hotel.html', {'hotels': hotels, 'form': form})
-#
-#     def post(self, request, *args, **kwargs):
-#         form = HotelForm(request.POST)
-#         if form.is_valid():
-#             hotel_id = request.POST.get('hotel_id')
-#             if hotel_id:
-#                 hotel = Hotel.objects.get(id=hotel_id)
-#                 form = HotelForm(request.POST, instance=hotel)
-#             else:
-#                 form.save()
-#         return redirect('manage-hotel')
-#
-#     def get(self, request, *args, **kwargs):
-#         hotel_id = request.GET.get('hotel_id')
-#         if hotel_id:
-#             Hotel.objects.get(id=hotel_id).delete()
-#         return redirect('manage-hotel')  #
-#
-#
-# class ManageRoomView(View):
-#     def get(self, request, *args, **kwargs):
-#         rooms = Room.objects.all()
-#         form = RoomForm()
-#         return render(request, 'manage_room.html', {'rooms': rooms, 'form': form})
-#
-#     def post(self, request, *args, **kwargs):
-#         form = RoomForm(request.POST)
-#         if form.is_valid():
-#             new_room = form.save()
-#             return redirect('manage-room')
-#         rooms = Room.objects.all()
-#         return render(request, 'manage_room.html', {'rooms': rooms, 'form': form})

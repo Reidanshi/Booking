@@ -1,0 +1,14 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}{{ room.room_type }} в отеле {{ room.hotel.name }}{% endblock %}
+
+{% block content %}
+    <div class="features">
+        <h1>{{ room.room_type }} в отеле {{ room.hotel.name }}</h1>
+        <p>Цена за ночь: ${{ room.price_per_night }}</p>
+        <p>{{ room.description }}</p>
+        <img src="{{ room.photos.url }}" alt="{{ room.room_type }}">
+        <p>Доступность: {% if room.available %}Доступна{% else %}Забронирована{% endif %}</p>
+        <a href="{% url 'room-list' pk=room.hotel.pk %}" class="btn btn-info">Все комнаты</a>
+    </div>
+{% endblock %}
