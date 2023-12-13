@@ -6,9 +6,20 @@
     <div class="features">
         <h1>{{ room.room_type }} в отеле {{ room.hotel.name }}</h1>
         <p>Цена за ночь: ${{ room.price_per_night }}</p>
-        <p>{{ room.description }}</p>
+        <p>Доступность: {% if room.available %}Доступна{% else %}Занята{% endif %}</p>
         <img src="{{ room.photos.url }}" alt="{{ room.room_type }}">
-        <p>Доступность: {% if room.available %}Доступна{% else %}Забронирована{% endif %}</p>
-        <a href="{% url 'room-list' pk=room.hotel.pk %}" class="btn btn-info">Все комнаты</a>
+        <p>Описание: {{ room.description }}</p>
+        {% if user.is_authenticated %}
+            <form method="post" action="{% url 'book-room' pk=room.hotel.pk room_id=room.pk %}">
+                {% csrf_token %}
+                <label for="check-in-date">Дата заезда:</label>
+                <input type="date" name="check-in-date" required>
+                <label for="check-out-date">Дата выезда:</label>
+                <input type="date" name="check-out-date" required>
+                <button type="submit" class="btn btn-success">Забронировать</button>
+            </form>
+        {% else %}
+            <p>Чтобы забронировать комнату, пожалуйста, войдите в систему.</p>
+        {% endif %}
     </div>
 {% endblock %}

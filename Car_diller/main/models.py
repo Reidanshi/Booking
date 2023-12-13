@@ -73,8 +73,8 @@ class Room(models.Model):
 
 
 class Booking(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    room_id = models.ForeignKey(Room, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
     check_in_date = models.DateField()
     check_out_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -82,8 +82,8 @@ class Booking(models.Model):
     deleted_at = models.DateTimeField(null=True, blank=True)
     deleted = models.BooleanField(default=False)
 
-
-
+    def __str__(self):
+        return f"{self.user.username} - {self.room.room_type} - {self.check_in_date} to {self.check_out_date}"
 
 
 class Review(models.Model):
