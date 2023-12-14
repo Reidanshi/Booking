@@ -4,7 +4,7 @@
 
 {% block content %}
     <h2>Регистрация</h2>
-    <form method="post" action="{% url 'register' %}">
+    <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Зарегистрироваться</button>

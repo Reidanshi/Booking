@@ -2,7 +2,7 @@ from django.forms import ModelForm, TextInput, Textarea, NumberInput
 from .models import Hotel, Room, Booking
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
 
 class HotelForm(ModelForm):
@@ -45,6 +45,8 @@ class RoomForm(ModelForm):
         fields = '__all__'
 
 class RegistrationForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+
     class Meta:
-        model = User
-        fields = ['username', 'email', 'password1', 'password2']
+        model = get_user_model()
+        fields = ('username', 'email', 'password1', 'password2')

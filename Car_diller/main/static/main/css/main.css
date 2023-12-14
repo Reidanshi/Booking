@@ -17,15 +17,6 @@ aside img {
     float: left;
 }
 
-/*aside .logo {*/
-/*    font-size: 40px;*/
-/*    margin-left: 10px;*/
-/*    font-weight: bold;*/
-/*    position: relative;*/
-/*    top: -5px;*/
-/*    color: white;*/
-/*}*/
-
 aside h3 {
     margin-top: 50px;
     font-size: 30px;
@@ -68,4 +59,11 @@ form {
     margin-left: 32%;
     width: 500px;
     margin-top: 50px;
+}
+
+body .register {
+    color: white;
+}
+body .login {
+    color: white;
 }

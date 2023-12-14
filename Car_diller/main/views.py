@@ -1,9 +1,10 @@
 from django.views.generic import DetailView
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Hotel, Room
+from .models import Hotel, Room, Booking
 from .forms import HotelForm, BookingForm, RegistrationForm
-from django.contrib.auth import login
-# from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib import messages
 
 
@@ -101,6 +102,20 @@ def book_room(request, pk, room_id):
     else:
         return render(request, 'main/rooms_detail_view.html', {'room': room, 'booking_form': booking_form})
 
+def manage_bookings(request):
+    bookings = Booking.objects.filter(user=request.user)
+    if request.method == 'POST':
+        form = BookingForm(request.POST)
+        if form.is_valid():
+            booking = form.save(commit=False)
+            booking.user = request.user
+            booking.save()
+            return redirect('manage-bookings')
+    else:
+        form = BookingForm()
+
+    return render(request, 'main/manage_bookings.html', {'form': form, 'bookings': bookings})
+
 
 def register(request):
     if request.method == 'POST':
@@ -113,4 +128,30 @@ def register(request):
         form = RegistrationForm()
 
     return render(request, 'main/register.html', {'form': form})
+
+@login_required
+def profile(request):
+    return render(request, 'main/profile.html')
+
+
+def custom_login(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+    return render(request, 'main/login.html')
+
+def custom_logout(request):
+    logout(request)
+    return redirect('home')
+
+class CustomLoginView(LoginView):
+    template_name = 'main/login.html'
+
+
+class CustomLogoutView(LogoutView):
+    template_name = 'path/to/logout.html'
 
