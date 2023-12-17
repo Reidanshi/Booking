@@ -4,17 +4,24 @@
 
 {% block content %}
     <h2>Управление бронированиями</h2>
-    <h3>Мои бронирования</h3>
-    <ul>
-        {% for booking in bookings %}
-            <li>{{ booking }}</li>
-        {% endfor %}
-    </ul>
-
-    <h3>Добавить новое бронирование</h3>
-    <form method="post" action="{% url 'manage-bookings' %}">
+        {% if bookings %}
+            <ul>
+                {% for booking in bookings %}
+                  <p>Бронирование №{{ booking.id }}: {{ booking.room.name }} - {{ booking.check_in_date }} до {{ booking.check_out_date }}
+                    <a href="{% url 'cancel-booking' booking.id %}">Отказаться от бронирования</a>
+                  </p>
+                {% endfor %}
+<!--              {% for booking in bookings %}-->
+<!--                <li>{{ booking.user.username }} забронировал(а) {{ booking.room.name }} в отеле {{ booking.room.hotel.name }}.</li>-->
+<!--              {% endfor %}-->
+            </ul>
+          {% else %}
+            <p>Бронирований нету.</p>
+          {% endif %}
+         <h3>Добавить новое бронирование</h3>
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Забронировать</button>
     </form>
 {% endblock %}
+

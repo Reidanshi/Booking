@@ -1,0 +1,12 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Add Review{% endblock %}
+
+{% block content %}
+  <h2>Add Review for {{ hotel.name }}</h2>
+  <form method="post" action="{% url 'add-review' hotel_id=hotel.id %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit Review</button>
+  </form>
+{% endblock %}

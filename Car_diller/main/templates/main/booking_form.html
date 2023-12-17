@@ -1,0 +1,15 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Форма бронирования{% endblock %}
+
+{% block content %}
+  <h2>Бронирование</h2>
+  <p>Отель: {{ hotel.name }}</p>
+  <p>Комната: {{ room.name }}</p>
+
+  <form method="post" action="{% url 'booking-form' hotel_id=hotel.id room_id=room.id %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Подтвердить бронирование</button>
+  </form>
+{% endblock %}

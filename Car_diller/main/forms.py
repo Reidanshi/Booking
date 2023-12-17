@@ -1,5 +1,5 @@
 from django.forms import ModelForm, TextInput, Textarea, NumberInput
-from .models import Hotel, Room, Booking
+from .models import Hotel, Room, Booking, Review
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
@@ -50,3 +50,22 @@ class RegistrationForm(UserCreationForm):
     class Meta:
         model = get_user_model()
         fields = ('username', 'email', 'password1', 'password2')
+
+class ManageBookingsForm(forms.Form):
+    hotel = forms.ChoiceField(choices=[], required=False)
+    room = forms.ChoiceField(choices=[], required=False)
+
+    def __init__(self, *args, **kwargs):
+        hotels = kwargs.pop('hotels', [])
+        rooms = kwargs.pop('rooms', [])
+
+        super(ManageBookingsForm, self).__init__(*args, **kwargs)
+
+        self.fields['hotel'].choices = [(hotel.id, str(hotel)) for hotel in hotels]
+        self.fields['room'].choices = [(room.id, str(room)) for room in rooms]
+
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['comment', 'rating']

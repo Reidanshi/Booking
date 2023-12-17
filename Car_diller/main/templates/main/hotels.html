@@ -5,19 +5,23 @@
 {% block content %}
     <div class="features">
         <h1>Список отелей</h1>
-        {% if hotels %}
+        <div class="row">
             {% for el in hotels %}
-                <div class="alert alert-danger">
-                    <h3>{{ el.name }}</h3>
-                    <p>{{ el.location }}</p>
-                    <a href="{% url 'hotel-detail' el.id %}" class="btn btn-info">Подробное описание</a>
-                    <a href="{% url 'room-list' pk=el.id %}" class="btn btn-info">Комнаты</a>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="{{ el.photos.url }}" class="card-img-top" alt="{{ el.name }}">
+                        <div class="card-body">
+                            <h3 class="card-title">{{ el.name }}</h3>
+                            <p class="card-text">{{ el.location }}</p>
+                            <a href="{% url 'hotel-detail' el.id %}" class="btn btn-info">Подробное описание</a>
+                            <a href="{% url 'room-list' pk=el.id %}" class="btn btn-info">Комнаты</a>
+                        </div>
+                    </div>
                 </div>
             {% endfor %}
-        {% else %}
-            <p>К сожелению отелей нет</p>
-        {% endif %}
+        </div>
     </div>
 {% endblock %}
 
 
+<img src="{{ el.photos.url }}" class="card-img-top" alt="{{ el.name }}">

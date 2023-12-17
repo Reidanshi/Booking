@@ -1,0 +1,27 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Отзывы о {{ hotel.name }}{% endblock %}
+
+{% block content %}
+    <h1>Отзывы о {{ hotel.name }}</h1>
+
+    <ul>
+        {% for review in reviews %}
+            <li>
+                <strong>{{ review.user.username }}:</strong>
+                {{ review.comment }} ({{ review.rating }}/5)
+                {% if review.user == user %}
+                    <a href="{% url 'update-review' pk=review.pk %}">Редактировать</a>
+                    <a href="{% url 'delete-review' pk=review.pk %}">Удалить</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h2>Оставить отзыв</h2>
+    <form method="post" action="{% url 'hotel-reviews' pk=hotel.pk %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Оставить отзыв</button>
+    </form>
+{% endblock %}

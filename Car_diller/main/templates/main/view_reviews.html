@@ -1,0 +1,15 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Reviews for {{ hotel.name }}{% endblock %}
+
+{% block content %}
+  <h2>Reviews for {{ hotel.name }}</h2>
+  <ul>
+    {% for review in reviews %}
+      <li>
+        <strong>{{ review.user.username }}:</strong>
+        {{ review.comment }} ({{ review.rating }}/5)
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}
