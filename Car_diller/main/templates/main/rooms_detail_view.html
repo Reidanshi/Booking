@@ -12,11 +12,11 @@
         {% if user.is_authenticated %}
             <form method="post" action="{% url 'book-room' pk=room.hotel.pk room_id=room.pk %}">
                 {% csrf_token %}
-                <label for="check-in-date">Дата заезда:</label>
-                <input type="date" name="check-in-date" required>
-                <label for="check-out-date">Дата выезда:</label>
-                <input type="date" name="check-out-date" required>
-                <button type="submit" class="btn btn-success">Забронировать</button>
+<!--                <label for="check-in-date">Дата заезда:</label>-->
+<!--                <input type="date" name="check-in-date" required>-->
+<!--                <label for="check-out-date">Дата выезда:</label>-->
+<!--                <input type="date" name="check-out-date" required>-->
+                <a href="{% url 'book-room' pk=room.hotel.pk room_id=room.pk %}"><button type="submit" class="btn btn-success">Забронировать</button></a>
             </form>
         {% else %}
             <p>Чтобы забронировать комнату, пожалуйста, войдите в систему.</p>

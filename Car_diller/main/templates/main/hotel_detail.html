@@ -1,23 +1,36 @@
 {% extends 'main/layout.html' %}
 
-{% block title %}{{ hotel.name }}{% endblock %}
+{% block title %}
+  {% if hotel %}
+    {{ hotel.name }} - Подробное описание
+  {% endif %}
+{% endblock %}
 
 {% block content %}
-    <div class="hotel-details">
-        <h1>{{ hotel.name }}</h1>
-        <img src="{{ hotel.photos.url }}" alt="{{ hotel.name }}">
+  <div class="hotel-details">
+    <div class="row">
+      <div class="col-md-6">
+        {% if hotel %}
+          <h1 class="text-center">{{ hotel.name }}</h1>
+          <img src="{{ hotel.photos.url }}" class="img-fluid" alt="{{ hotel.name }}">
+        {% endif %}
+      </div>
+      <div class="col-md-6">
+        {% if hotel %}
+          <p>{{ hotel.description }}</p>
+          <p>Удобства: {{ hotel.amenities }}</p>
+          <p>Адрес: {{ hotel.location }}</p>
+        {% endif %}
         <p>Средний рейтинг: {{ hotel.average_rating }} ({{ hotel.reviews.count }} отзывов)</p>
-
-        <h2>Отзывы</h2>
-        <ul>
-            {% for review in reviews %}
-                <li>
-                    <strong>{{ review.user.username }}:</strong>
-                    {{ review.comment }} ({{ review.rating }}/5)
-                </li>
-            {% endfor %}
-        </ul>
-
-        <a href="{% url 'room-list' pk=hotel.id %}" class="btn btn-info">Посмотреть комнаты</a>
+          <a href="{% url 'room-list' pk=hotel.id %}" class="btn btn-info">Посмотреть комнаты</a>
+        <div class="contact-info">
+          <p>Контактная информация:</p>
+          <p>Телефон: {{ hotel.phone }}</p>
+          <p>Email: {{ hotel.email }}</p>
+        </div>
+      </div>
     </div>
+  </div>
 {% endblock %}
+
+
