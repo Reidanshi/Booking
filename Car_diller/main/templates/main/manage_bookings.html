@@ -3,25 +3,24 @@
 {% block title %}Управление бронированиями{% endblock %}
 
 {% block content %}
-    <h2>Управление бронированиями</h2>
-        {% if bookings %}
-            <ul>
-                {% for booking in bookings %}
-                  <p>Бронирование №{{ booking.id }}: {{ booking.room.name }} - {{ booking.check_in_date }} до {{ booking.check_out_date }}
-                    <a href="{% url 'cancel-booking' booking.id %}">Отказаться от бронирования</a>
-                  </p>
-                {% endfor %}
-<!--              {% for booking in bookings %}-->
-<!--                <li>{{ booking.user.username }} забронировал(а) {{ booking.room.name }} в отеле {{ booking.room.hotel.name }}.</li>-->
-<!--              {% endfor %}-->
-            </ul>
-          {% else %}
-            <p>Бронирований нету.</p>
+  <h2 class="text-white">Управление бронированиями</h2>
+  {% if bookings %}
+    <ul>
+      {% for booking in bookings %}
+        <p class="text-white">
+          Бронирование №{{ booking.id }}: {{ booking.room.name }} - {{ booking.check_in_date }} до {{ booking.check_out_date }}
+          <a href="{% url 'cancel-booking' booking.id %}" class="text-white">Отказаться от бронирования</a>
+          {% if not booking.is_approved and not booking.is_rejected %}
+            <form method="post" action="{% url 'approve-reject-booking' booking.id %}" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" name="action" value="approve" class="btn btn-success">Одобрить</button>
+              <button type="submit" name="action" value="reject" class="btn btn-danger">Отклонить</button>
+            </form>
           {% endif %}
-         <h3>Добавить новое бронирование</h3>
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Забронировать</button>
-    </form>
+        </p>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-white">Бронирований нету.</p>
+  {% endif %}
 {% endblock %}
-

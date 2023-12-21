@@ -1,0 +1,19 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}
+  {% if room %}
+    {{ room.room_type }} - {% if request.resolver_match.url_name == 'room-add' %}Добавление{% else %}Редактирование{% endif %}
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <h1 class="text-center">
+    {% if request.resolver_match.url_name == 'room-add' %}Добавление{% else %}Редактирование{% endif %} номера
+  </h1>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">{% if request.resolver_match.url_name == 'room-add' %}Добавить{% else %}Сохранить{% endif %}</button>
+  </form>
+  <a href="{% url 'hotel-detail' pk=room.hotel.id %}">Назад к отелю</a>
+{% endblock %}

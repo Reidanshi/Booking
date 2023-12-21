@@ -1,8 +1,9 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractUser, PermissionsMixin, BaseUserManager, Group
+from .managers import HotelManager
 
 
-class UserManager(BaseUserManager):
+class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError('The Email field must be set')
@@ -16,19 +17,34 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+
         return self.create_user(email, password, **extra_fields)
+
+
 class User(AbstractUser, PermissionsMixin):
     first_name = models.CharField(max_length=50, blank=True)
     last_name = models.CharField(max_length=50, blank=True)
-    email = models.EmailField()
+    photos = models.ImageField(upload_to='user_images/', blank=False, null=False)
+    email = models.EmailField(unique=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     phone_number = models.CharField(max_length=11, blank=True, null=True)
+    hotel = models.ForeignKey('main.Hotel', on_delete=models.CASCADE, null=True, blank=True)
+    age = models.PositiveIntegerField(blank=True, null=True)
+    passport_data = models.CharField(max_length=255, blank=True, null=True)
 
-    def __str__(self):
-        return self.email
+    objects = CustomUserManager()
 
+    def save(self, *args, **kwargs):
+        if self.is_superuser:
+            group, created = Group.objects.get_or_create(name='Hotel Administrator')
+            self.groups.add(group)
+        super().save(*args, **kwargs)
 
 
 class Hotel(models.Model):
@@ -45,6 +61,8 @@ class Hotel(models.Model):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     address = models.CharField(max_length=250, blank=True, null=True)
+    admin = models.OneToOneField(User, on_delete=models.CASCADE)
+    objects = HotelManager()
 
     def __str__(self):
         return self.name
@@ -77,6 +95,10 @@ class Room(models.Model):
 
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
     room_type = models.CharField(max_length=20, choices=ROOM_TYPES)
+    description = models.TextField()
+    beds_counter = models.PositiveSmallIntegerField()
+    number_room = models.PositiveSmallIntegerField()
+    level = models.PositiveSmallIntegerField()
     photos = models.ImageField(upload_to='room_images/', blank=False, null=False)
     price_per_night = models.DecimalField(max_digits=10, decimal_places=2)
     available = models.BooleanField(default=True)
@@ -86,7 +108,7 @@ class Room(models.Model):
     deleted = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.room_type
+        return f"{self.number_room} - {self.room_type}"
 
 
 

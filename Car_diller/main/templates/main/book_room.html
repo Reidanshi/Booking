@@ -3,12 +3,19 @@
 {% block title %}Бронирование комнаты{% endblock %}
 
 {% block content %}
-  <h2>Бронирование комнаты</h2>
-  <p>Комната: {{ room.name }}</p>
-
-  <form method="post" action="{% url 'book-room' pk=room.hotel.id room_id=room.id %}">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Подтвердить бронирование</button>
-  </form>
+  <div class="booking-room-card">
+    <div class="row">
+      <div class="col-md-6">
+        <h2 class="text-center">Бронирование комнаты</h2>
+        <p>Комната: {{ room.number_room }},{{ room.room_type }}</p>
+        <form method="post" action="{% url 'book-room' pk=room.hotel.id room_id=room.id %}">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <div class="form-group">
+            <button type="submit">Подтвердить бронирование</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 {% endblock %}

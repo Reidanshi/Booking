@@ -1,0 +1,12 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Удаление номера{% endblock %}
+
+{% block content %}
+  <h1 class="text-center">Вы уверены, что хотите удалить номер "{{ room.room_type }}"?</h1>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit">Удалить</button>
+  </form>
+  <a href="{% url 'hotel-detail' pk=room.hotel.id %}">Назад к отелю</a>
+{% endblock %}

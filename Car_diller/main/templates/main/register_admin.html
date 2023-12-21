@@ -1,0 +1,22 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Регистрация администратора{% endblock %}
+
+{% block content %}
+  <div class="registration-card">
+    <div class="row">
+      <div class="col-md-6">
+        <h2 class="text-center">Регистрация администратора</h2>
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <div class="form-group">
+            <label for="profile_picture">Фото профиля</label>
+            <input type="file" name="profile_picture" accept="image/*" class="form-control-file">
+          </div>
+          <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -3,23 +3,25 @@
 {% block title %}{{ room.room_type }} в отеле {{ room.hotel.name }}{% endblock %}
 
 {% block content %}
-    <div class="features">
-        <h1>{{ room.room_type }} в отеле {{ room.hotel.name }}</h1>
-        <p>Цена за ночь: ${{ room.price_per_night }}</p>
-        <p>Доступность: {% if room.available %}Доступна{% else %}Занята{% endif %}</p>
-        <img src="{{ room.photos.url }}" alt="{{ room.room_type }}">
-        <p>Описание: {{ room.description }}</p>
-        {% if user.is_authenticated %}
-            <form method="post" action="{% url 'book-room' pk=room.hotel.pk room_id=room.pk %}">
-                {% csrf_token %}
-<!--                <label for="check-in-date">Дата заезда:</label>-->
-<!--                <input type="date" name="check-in-date" required>-->
-<!--                <label for="check-out-date">Дата выезда:</label>-->
-<!--                <input type="date" name="check-out-date" required>-->
-                <a href="{% url 'book-room' pk=room.hotel.pk room_id=room.pk %}"><button type="submit" class="btn btn-success">Забронировать</button></a>
-            </form>
-        {% else %}
-            <p>Чтобы забронировать комнату, пожалуйста, войдите в систему.</p>
-        {% endif %}
+    <div class="room-details">
+        <div class="row">
+            <div class="col-md-6">
+                {% if room %}
+                    <h1 class="text-center">{{ room.room_type }} в отеле {{ room.hotel.name }}</h1>
+                    <img src="{{ room.photos.url }}" class="img-fluid" alt="{{ room.room_type }}">
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                {% if room %}
+                    <p>Цена за ночь: ${{ room.price_per_night }}</p>
+                    <p>Доступность: {% if room.available %}Доступна{% else %}Занята{% endif %}</p>
+                    <p>Описание: {{ room.description }}</p>
+                    <a href="{% url 'book-room' pk=room.hotel.pk room_id=room.pk %}" class="btn btn-success">Забронировать</a>
+                    <div class="contact-info">
+                        <p>Контактная информация:</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
     </div>
 {% endblock %}

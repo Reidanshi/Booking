@@ -1,7 +1,19 @@
 {% extends 'main/layout.html' %}
 
+{% block title %}Профиль пользователя{% endblock %}
+
 {% block content %}
-  <h1>Профиль пользователя</h1>
-  <p>Добро пожаловать, {{ user.username }}!</p>
-  <p>Email: {{ user.email }}</p>
+  <div class="profile-card">
+    <h1>Профиль пользователя</h1>
+    <div class="profile-info">
+      <div class="profile-img-container">
+        <img src="{{ user.profile.photos.url }}" alt="Фото профиля" class="profile-img">
+      </div>
+      <div class="user-details">
+        <p>Добро пожаловать, {{ user.username }}!</p>
+        <p>Email: {{ user.email }}</p>
+        <a href="{% url 'logout' %}"><li><i class="fas fa-times-circle"></i>Выйти</li></a>
+      </div>
+    </div>
+  </div>
 {% endblock %}

@@ -1,5 +1,5 @@
 from django.forms import ModelForm, TextInput, Textarea, NumberInput
-from .models import Hotel, Room, Booking, Review
+from .models import Hotel, Room, Booking, Review, User
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
@@ -29,6 +29,26 @@ class HotelForm(ModelForm):
             })
         }
 
+class HotelRegistrationForm(forms.ModelForm):
+    class Meta:
+        model = Hotel
+        fields = ['name', 'description', 'location', 'photos']
+
+class HotelUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Hotel
+        fields = ['name', 'description', 'location', 'photos']
+
+class ManageRoomsForm(forms.Form):
+    room = forms.ModelChoiceField(queryset=Room.objects.all(), required=False)
+
+class ManageBookingsForm(forms.Form):
+    hotel = forms.ModelChoiceField(queryset=None)  # Заполняется в представлении
+    room = forms.ModelChoiceField(queryset=None)  # Заполняется в представлении
+    booking = forms.ModelChoiceField(queryset=None)  # Заполняется в представлении
+    action = forms.ChoiceField(choices=[('approve', 'Одобрить'), ('reject', 'Отклонить')])
+
+
 class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking
@@ -39,10 +59,12 @@ class BookingForm(forms.ModelForm):
             'check_out_date': forms.DateInput(attrs={'type': 'date'}),
         }
 
+
 class RoomForm(ModelForm):
     class Meta:
         model = Room
         fields = '__all__'
+
 
 class RegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -50,6 +72,19 @@ class RegistrationForm(UserCreationForm):
     class Meta:
         model = get_user_model()
         fields = ('username', 'email', 'password1', 'password2')
+
+class CustomUserCreationForm(UserCreationForm):
+    email = forms.EmailField(max_length=254, help_text='Обязательное поле. Введите действующий адрес электронной почты.')
+    first_name = forms.CharField(max_length=30, required=True, help_text='Обязательное поле.')
+    last_name = forms.CharField(max_length=30, required=True, help_text='Обязательное поле.')
+    age = forms.IntegerField(required=True, help_text='Обязательное поле.')
+    passport_data = forms.CharField(max_length=20, required=True, help_text='Обязательное поле.')
+    phone_number = forms.CharField(max_length=11, required=True, help_text='Обязательное поле.')
+
+    class Meta:
+        model = User
+        fields = UserCreationForm.Meta.fields + ('email', 'first_name', 'last_name', 'age', 'passport_data', 'phone_number', 'photos')
+
 
 class ManageBookingsForm(forms.Form):
     hotel = forms.ChoiceField(choices=[], required=False)
@@ -69,3 +104,9 @@ class ReviewForm(forms.ModelForm):
     class Meta:
         model = Review
         fields = ['comment', 'rating']
+
+# class BookingForm(forms.ModelForm):
+#     class Meta:
+#         model = Booking
+#         fields = ['user', 'room', 'check_in_date', 'check_out_date']
+

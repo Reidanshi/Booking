@@ -1,0 +1,12 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Регистрация отеля{% endblock %}
+
+{% block content %}
+  <h2>Регистрация отеля</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Зарегистрировать отель</button>
+  </form>
+{% endblock %}

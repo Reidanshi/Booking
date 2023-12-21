@@ -3,10 +3,19 @@
 {% block title %}Вход{% endblock %}
 
 {% block content %}
-    <h2>Вход</h2>
-    <form method="post" action="{% url 'login' %}">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Войти</button>
-    </form>
+  <div class="login-card">
+    <div class="row">
+      <div class="col-md-6">
+        <h2 class="text-center">Вход</h2>
+        <form method="post" action="{% url 'login' %}">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <div class="form-group">
+            <button type="submit">Войти</button>
+          </div>
+        </form>
+      </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}
