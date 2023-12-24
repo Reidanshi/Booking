@@ -1,0 +1,26 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Управление бронированиями{% endblock %}
+
+{% block content %}
+    <h2 class="text-white">Управление бронированиями</h2>
+    {% if bookings %}
+        <ul>
+            {% for booking in bookings %}
+                <p class="text-white">
+                    Бронирование №{{ booking.id }}: {{ booking.room.name }} - {{ booking.check_in_date }} до {{ booking.check_out_date }}
+                    <a href="{% url 'cancel-booking' booking.id %}" class="text-white">Отказаться от бронирования</a>
+                    {% if booking.is_approved %}
+                        <span class="text-success">Одобрено</span>
+                    {% else %}
+                        <span class="text-warning">На рассмотрении</span>
+                        <a href="{% url 'approve-booking' booking.id %}" class="text-success">Одобрить</a>
+                        <a href="{% url 'reject-booking' booking.id %}" class="text-danger">Отклонить</a>
+                    {% endif %}
+                </p>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-white">Бронирований нету.</p>
+    {% endif %}
+{% endblock %}

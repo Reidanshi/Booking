@@ -32,20 +32,24 @@ class HotelForm(ModelForm):
 class HotelRegistrationForm(forms.ModelForm):
     class Meta:
         model = Hotel
-        fields = ['name', 'description', 'location', 'photos']
+        fields = ['name', 'location', 'description', 'photos', 'room_count', 'phone_number', 'email', 'address']
 
 class HotelUpdateForm(forms.ModelForm):
     class Meta:
         model = Hotel
-        fields = ['name', 'description', 'location', 'photos']
+        fields = ['name', 'location', 'description', 'photos', 'room_count', 'phone_number', 'email', 'address']
 
-class ManageRoomsForm(forms.Form):
-    room = forms.ModelChoiceField(queryset=Room.objects.all(), required=False)
+
+
+class AddRoomForm(forms.ModelForm):
+    class Meta:
+        model = Room
+        fields = ['room_type', 'description', 'beds_counter', 'number_room', 'level', 'photos', 'price_per_night']
 
 class ManageBookingsForm(forms.Form):
-    hotel = forms.ModelChoiceField(queryset=None)  # Заполняется в представлении
-    room = forms.ModelChoiceField(queryset=None)  # Заполняется в представлении
-    booking = forms.ModelChoiceField(queryset=None)  # Заполняется в представлении
+    hotel = forms.ModelChoiceField(queryset=None)
+    room = forms.ModelChoiceField(queryset=None)
+    booking = forms.ModelChoiceField(queryset=None)
     action = forms.ChoiceField(choices=[('approve', 'Одобрить'), ('reject', 'Отклонить')])
 
 

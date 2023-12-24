@@ -41,10 +41,13 @@ class User(AbstractUser, PermissionsMixin):
     objects = CustomUserManager()
 
     def save(self, *args, **kwargs):
-        if self.is_superuser:
-            group, created = Group.objects.get_or_create(name='Hotel Administrator')
-            self.groups.add(group)
-        super().save(*args, **kwargs)
+        if not self.id:  # Проверяем, что id установлен
+            super().save(*args, **kwargs)  # Сначала сохраняем пользователя, чтобы у него был id
+            if self.is_superuser:
+                group, created = Group.objects.get_or_create(name='Hotel Administrator')
+                self.groups.add(group)
+        else:
+            super().save(*args, **kwargs)
 
 
 class Hotel(models.Model):
@@ -61,7 +64,7 @@ class Hotel(models.Model):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     address = models.CharField(max_length=250, blank=True, null=True)
-    admin = models.OneToOneField(User, on_delete=models.CASCADE)
+    admin = models.OneToOneField(User, on_delete=models.CASCADE, related_name='admin_hotel')
     objects = HotelManager()
 
     def __str__(self):

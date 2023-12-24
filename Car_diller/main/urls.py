@@ -2,9 +2,10 @@ from django.urls import path
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import register, register_admin, profile, manage_bookings, cancel_booking, view_reviews, HotelReviewsView, RoomCreateView, RoomUpdateView, RoomDeleteView, ReservationListView
-from .views import CustomLoginView, custom_logout, hotel_detail, add_review, HotelCreateView, HotelUpdateView, HotelDeleteView, RoomAvailabilityView
-
+from .views import register, register_admin, profile, manage_bookings, cancel_booking, view_reviews
+from .views import CustomLoginView, custom_logout, hotel_detail, add_review, HotelCreateView, HotelUpdateView, update_hotel, add_room
+from .views import HotelReviewsView, RoomCreateView, RoomUpdateView, RoomDeleteView, ReservationListView, delete_hotel, manage_rooms
+from .views import HotelDeleteView, RoomAvailabilityView, manage_bookings_admin, view_reviews_admin, my_hotel, register_hotel
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -17,9 +18,18 @@ urlpatterns = [
     path('accounts/profile/', profile, name='profile'),
     path('accounts/login/', CustomLoginView.as_view(), name='login'),
     path('accounts/logout/', custom_logout, name='logout'),
+    path('register-hotel/', register_hotel, name='register-hotel'),
+    path('my-hotel/', my_hotel, name='my-hotel'),
+    path('edit-hotel/<int:pk>/', update_hotel, name='edit-hotel'),
+    path('manage-rooms/<int:pk>/', manage_rooms, name='manage-rooms'),
+    path('add-room/<int:pk>/', add_room, name='add-room'),
+    path('delete-hotel/<int:pk>/', delete_hotel, name='delete-hotel'),
+    path('manage-bookings-admin/', manage_bookings_admin, name='manage-bookings-admin'),
+    path('view-reviews-admin/', view_reviews_admin, name='view-reviews-admin'),
     path('hotels/<int:pk>/rooms/<int:room_id>/book/', views.book_room, name='book-room'),
     path('cancel-booking/<int:booking_id>/', cancel_booking, name='cancel-booking'),
     path('manage-bookings/', manage_bookings, name='manage-bookings'),
+    path('manage-bookings/admin/', manage_bookings_admin, name='manage-bookings-admin'),
     path('hotels/<int:hotel_id>/add-review/', add_review, name='add-review'),
     path('my-reviews/<int:pk>/', view_reviews, name='view-reviews'),
     path('manage-bookings/<int:hotel_id>/', manage_bookings, name='manage-bookings-hotel'),

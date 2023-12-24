@@ -1,12 +1,12 @@
 {% extends 'main/layout.html' %}
 
-{% block title %}Регистрация отеля{% endblock %}
+{% block title %}Регистрация номера{% endblock %}
 
 {% block content %}
   <div class="registration-card">
     <div class="row">
       <div class="col-md-6">
-        <h2 class="text-center">Регистрация отеля</h2>
+        <h2 class="text-center">Регистрация номера</h2>
         {% if messages %}
           <div class="messages">
             {% for message in messages %}
@@ -17,38 +17,34 @@
         <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
           <div class="mb-3">
-            {{ form.name.label_tag }}
-            {{ form.name }}
-          </div>
-          <div class="mb-3">
-            {{ form.location.label_tag }}
-            {{ form.location }}
+            {{ form.room_type.label_tag }}
+            {{ form.room_type }}
           </div>
           <div class="mb-3">
             {{ form.description.label_tag }}
             {{ form.description }}
           </div>
           <div class="mb-3">
+            {{ form.beds_counter.label_tag }}
+            {{ form.beds_counter }}
+          </div>
+          <div class="mb-3">
+            {{ form.number_room.label_tag }}
+            {{ form.number_room }}
+          </div>
+          <div class="mb-3">
+            {{ form.level.label_tag }}
+            {{ form.level }}
+          </div>
+          <div class="mb-3">
             {{ form.photos.label_tag }}
             {{ form.photos }}
           </div>
           <div class="mb-3">
-            {{ form.room_count.label_tag }}
-            {{ form.room_count }}
+            {{ form.price_per_night.label_tag }}
+            {{ form.price_per_night }}
           </div>
-          <div class="mb-3">
-            {{ form.phone_number.label_tag }}
-            {{ form.phone_number }}
-          </div>
-          <div class="mb-3">
-            {{ form.email.label_tag }}
-            {{ form.email }}
-          </div>
-          <div class="mb-3">
-            {{ form.address.label_tag }}
-            {{ form.address }}
-          </div>
-          <button type="submit" class="btn btn-primary">Зарегистрировать отель</button>
+          <button type="submit" class="btn btn-primary">Зарегистрировать комнату</button>
         </form>
       </div>
     </div>

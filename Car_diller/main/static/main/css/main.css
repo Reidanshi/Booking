@@ -101,7 +101,6 @@ form {
     margin-bottom: 20px;
 }
 
-/* Стилизация текста */
 .hotel-details p, .hotel-details li {
     color: white;
     text-align: left;
@@ -223,4 +222,44 @@ form {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     max-width: 600px; /* Максимальная ширина карточки */
     margin: 20px auto; /* Центрирование карточки по горизонтали */
+}
+
+.hotel-details-admin {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.hotel-details-admin h1 {
+    font-size: 24px;
+    color: white;
+}
+
+
+.hotel-details-admin img {
+    float: left;
+    max-width: 400px;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+.hotel-details-admin p, .hotel-details-admin li {
+    color: white;
+    text-align: left;
+    max-width: 400px;
+}
+
+
+.hotel-details-admin h2 {
+    font-size: 20px;
+    color: white;
+}
+
+.hotel-details-admin ul {
+    list-style: none;
+    padding: 0;
+}
+
+.hotel-details-admin ul li {
+    line-height: 30px;
 }

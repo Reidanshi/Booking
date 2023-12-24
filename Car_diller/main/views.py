@@ -3,19 +3,24 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Hotel, Room, Booking, Review
 from .forms import BookingForm, RegistrationForm, ManageBookingsForm, ReviewForm, CustomUserCreationForm
+from .forms import HotelRegistrationForm, HotelUpdateForm, AddRoomForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from datetime import date
 from django.db.models import Q
+from django.http import HttpResponseForbidden
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib import messages
 
 
 def home(request):
-    date = {
+    context = {
         'title': 'Roch Hotels Official Site',
+        'user': request.user
     }
-    return render(request, 'main/main.html', date)
+    return render(request, 'main/main.html', context)
 
 
 def hotels(request):
@@ -197,25 +202,38 @@ def manage_bookings(request, hotel_id=None, room_id=None):
     context = {'form': form, 'hotel_id': hotel_id, 'room_id': room_id}
     return render(request, 'main/manage_bookings.html', {'bookings': bookings})
 
+
 @login_required
 def register_hotel(request):
     if request.method == 'POST':
-        form = HotelRegistrationForm(request.POST)
+        form = HotelRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
             hotel = form.save(commit=False)
             hotel.admin = request.user
             hotel.save()
-            return redirect('hotel-detail', pk=hotel.pk)
+            messages.success(request, 'Отель успешно зарегистрирован!')
+            return redirect('my-hotel')
+        else:
+            messages.error(request, 'Пожалуйста, исправьте ошибки в форме.')
     else:
         form = HotelRegistrationForm()
 
     return render(request, 'main/register_hotel.html', {'form': form})
 
+
+@login_required
+def my_hotel(request):
+    user_hotel = Hotel.objects.filter(admin=request.user).first()
+    return render(request, 'main/my_hotel.html', {'user_hotel': user_hotel})
+
+@login_required
+def view_reviews_admin(request):
+    return render(request, 'main/view_reviews_admin.html')
+
 @login_required
 def update_hotel(request, pk):
     hotel = get_object_or_404(Hotel, pk=pk)
 
-    # Проверка, что пользователь - администратор этого отеля
     if hotel.admin != request.user:
         return HttpResponseForbidden("Вы не являетесь администратором этого отеля.")
 
@@ -223,7 +241,7 @@ def update_hotel(request, pk):
         form = HotelUpdateForm(request.POST, instance=hotel)
         if form.is_valid():
             form.save()
-            return redirect('hotel-detail', pk=hotel.pk)
+            return redirect('my-hotel', pk=hotel.pk)
     else:
         form = HotelUpdateForm(instance=hotel)
 
@@ -233,7 +251,6 @@ def update_hotel(request, pk):
 def delete_hotel(request, pk):
     hotel = get_object_or_404(Hotel, pk=pk)
 
-    # Проверка, что пользователь - администратор этого отеля
     if hotel.admin != request.user:
         return HttpResponseForbidden("Вы не являетесь администратором этого отеля.")
 
@@ -243,30 +260,44 @@ def delete_hotel(request, pk):
 
     return render(request, 'main/delete_hotel.html', {'hotel': hotel})
 
-@login_required
-def manage_rooms(request, hotel_id):
-    hotel = get_object_or_404(Hotel, pk=hotel_id)
 
-    # Проверка, что пользователь - администратор этого отеля
+@login_required
+def manage_rooms(request, pk):
+    hotel = get_object_or_404(Hotel, pk=pk)
+
     if hotel.admin != request.user:
         return HttpResponseForbidden("Вы не являетесь администратором этого отеля.")
 
     rooms = Room.objects.filter(hotel=hotel)
 
-    if request.method == 'POST':
-        form = ManageRoomsForm(request.POST, rooms=rooms)
-        if form.is_valid():
-            # Обработка данных формы
-            return redirect('manage-rooms', hotel_id=hotel_id)
-    else:
-        form = ManageRoomsForm(rooms=rooms)
+    return render(request, 'main/manage_rooms.html', {'hotel': hotel, 'rooms': rooms})
 
-    return render(request, 'main/manage_rooms.html', {'form': form, 'hotel': hotel, 'rooms': rooms})
+
+@login_required
+def add_room(request, pk):
+    hotel = get_object_or_404(Hotel, pk=pk)
+
+    if request.method == 'POST':
+        form = AddRoomForm(request.POST, request.FILES)
+        if form.is_valid():
+            room = form.save(commit=False)
+            room.hotel = hotel
+            room.save()
+            hotel.room.add(room)
+            messages.success(request, 'Комната успешно зарегистрирована!')
+            return redirect('manage-rooms', pk=pk)
+        else:
+            messages.error(request, 'Пожалуйста, исправьте ошибки в форме.')
+    else:
+        form = AddRoomForm()
+
+    return render(request, 'main/add_room.html', {'form': form, 'hotel': hotel})
+
+
 
 @login_required
 def manage_bookings(request, hotel_id=None, room_id=None):
     hotels = Hotel.objects.get_for_admin(request.user)
-    # Проверка, что пользователь - администратор хотя бы одного отеля
     if not hotels.exists():
         return HttpResponseForbidden("У вас нет прав для управления бронированиями отелей.")
 
@@ -296,6 +327,12 @@ def manage_bookings(request, hotel_id=None, room_id=None):
     context = {'form': form, 'hotel_id': hotel_id, 'room_id': room_id}
     return render(request, 'main/manage_bookings.html', {'bookings': bookings, 'form': form})
 
+@user_passes_test(lambda u: u.is_staff)
+def manage_bookings_admin(request, hotel_id=None, room_id=None):
+    bookings = Booking.objects.all()
+
+    context = {'bookings': bookings}
+    return render(request, 'main/manage_bookings_admin.html', context)
 
 @login_required
 def add_review(request, hotel_id):

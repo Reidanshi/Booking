@@ -1,0 +1,25 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Редактирование отеля{% endblock %}
+
+{% block content %}
+  <div class="registration-card">
+    <div class="row">
+      <div class="col-md-6">
+        <h2 class="text-center">Редактирование отеля</h2>
+        {% if messages %}
+          <div class="messages">
+            {% for message in messages %}
+              <div class="{% if message.tags %}alert alert-{{ message.tags }}{% endif %}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

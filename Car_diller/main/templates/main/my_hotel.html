@@ -1,0 +1,29 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Мой отель{% endblock %}
+
+{% block content %}
+  <div class="hotel-details">
+    <h2>Информация о моем отеле</h2>
+    {% if user_hotel %}
+      <ul>
+        <li><strong>Название:</strong> {{ user_hotel.name }}</li>
+        <li><strong>Местоположение:</strong> {{ user_hotel.location }}</li>
+        <li><strong>Описание:</strong> {{ user_hotel.description }}</li>
+        <li><strong>Фотографии:</strong> <img src="{{ user_hotel.photos.url }}" alt="Фото отеля"></li>
+        <li><strong>Количество номеров:</strong> {{ user_hotel.room_count }}</li>
+        <li><strong>Номер телефона:</strong> {{ user_hotel.phone_number }}</li>
+        <li><strong>Email:</strong> {{ user_hotel.email }}</li>
+        <li><strong>Адрес:</strong> {{ user_hotel.address }}</li>
+      </ul>
+
+      <div class="buttons">
+        <a href="{% url 'edit-hotel' user_hotel.id %}" class="btn btn-primary">Редактировать</a>
+        <a href="{% url 'manage-rooms' user_hotel.id %}" class="btn btn-success">Менеджер комнат</a>
+        <a href="{% url 'delete-hotel' user_hotel.id %}" class="btn btn-danger">Удалить отель</a>
+      </div>
+    {% else %}
+      <p>У вас пока нет зарегистрированного отеля.</p>
+    {% endif %}
+  </div>
+{% endblock %}
