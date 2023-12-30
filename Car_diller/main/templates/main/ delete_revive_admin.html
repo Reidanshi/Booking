@@ -1,0 +1,23 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Удалить/Восстановить отзыв{% endblock %}
+
+{% block content %}
+  <h2 class="text-white">
+    {% if review.deleted %}
+      Восстановить отзыв
+    {% else %}
+      Удалить отзыв
+    {% endif %}
+  </h2>
+  <form method="post" action="{% url 'delete-revive-admin' review.id %}">
+    {% csrf_token %}
+    <button type="submit">
+      {% if review.deleted %}
+        Восстановить
+      {% else %}
+        Удалить
+      {% endif %}
+    </button>
+  </form>
+{% endblock %}

@@ -9,6 +9,7 @@ aside {
     width: 17%;
     padding: 2.5%;
     min-height: 100vh;
+    overflow-y: auto;
     color: #fff;
     border-right: 5px solid #4d4d4d;
 }

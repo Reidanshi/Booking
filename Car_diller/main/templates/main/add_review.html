@@ -3,10 +3,10 @@
 {% block title %}Add Review{% endblock %}
 
 {% block content %}
-  <h2>Add Review for {{ hotel.name }}</h2>
-  <form method="post" action="{% url 'add-review' hotel_id=hotel.id %}">
+   <h2 style="color: white;">Add Review for {{ hotel.name }}</h2>
+  <form style="color: white;" method="post" action="{% url 'add-review' hotel_id=hotel.id %}">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Submit Review</button>
+    <button type="submit">Оставить отзыв</button>
   </form>
 {% endblock %}

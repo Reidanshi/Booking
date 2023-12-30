@@ -4,23 +4,18 @@
 
 {% block content %}
   <h2 class="text-white">Управление бронированиями</h2>
-  {% if bookings %}
+  {% if user_bookings %}
     <ul>
-      {% for booking in bookings %}
+      {% for booking in user_bookings %}
         <p class="text-white">
-          Бронирование №{{ booking.id }}: {{ booking.room.name }} - {{ booking.check_in_date }} до {{ booking.check_out_date }}
-          <a href="{% url 'cancel-booking' booking.id %}" class="text-white">Отказаться от бронирования</a>
-          {% if not booking.is_approved and not booking.is_rejected %}
-            <form method="post" action="{% url 'approve-reject-booking' booking.id %}" class="d-inline">
-              {% csrf_token %}
-              <button type="submit" name="action" value="approve" class="btn btn-success">Одобрить</button>
-              <button type="submit" name="action" value="reject" class="btn btn-danger">Отклонить</button>
-            </form>
+          Ваше бронирование в отеле {{ booking.room.hotel.name }} в комнате №{{ booking.room.number }} с {{ booking.check_in_date }} до {{ booking.check_out_date }} - {{ booking.status }}
+          {% if booking.status == 'on_review' %}
+              <a href="{% url 'cancel-booking' booking.id %}" class="text-white">Отказаться от бронирования</a>
           {% endif %}
-        </p>
+      </p>
       {% endfor %}
     </ul>
   {% else %}
-    <p class="text-white">Бронирований нету.</p>
+    <p class="text-white">У вас нет активных бронирований.</p>
   {% endif %}
 {% endblock %}

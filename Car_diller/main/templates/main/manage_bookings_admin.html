@@ -9,9 +9,10 @@
             {% for booking in bookings %}
                 <p class="text-white">
                     Бронирование №{{ booking.id }}: {{ booking.room.name }} - {{ booking.check_in_date }} до {{ booking.check_out_date }}
-                    <a href="{% url 'cancel-booking' booking.id %}" class="text-white">Отказаться от бронирования</a>
-                    {% if booking.is_approved %}
+                    {% if booking.status == 'approved' %}
                         <span class="text-success">Одобрено</span>
+                    {% elif booking.status == 'rejected' %}
+                        <span class="text-danger">Отклонено</span>
                     {% else %}
                         <span class="text-warning">На рассмотрении</span>
                         <a href="{% url 'approve-booking' booking.id %}" class="text-success">Одобрить</a>

@@ -22,11 +22,13 @@
           <p>Адрес: {{ hotel.location }}</p>
         {% endif %}
         <p>Средний рейтинг: {{ hotel.average_rating }} ({{ hotel.reviews.count }} отзывов)</p>
-          <a href="{% url 'room-list' pk=hotel.id %}" class="btn btn-info">Посмотреть комнаты</a>
         <div class="contact-info">
           <p>Контактная информация:</p>
           <p>Телефон: {{ hotel.phone }}</p>
           <p>Email: {{ hotel.email }}</p>
+          <a href="{% url 'room-list' pk=hotel.id %}" class="btn btn-info">Посмотреть комнаты</a>
+          <a href="{% url 'add-review' hotel_id=hotel.id %}" class="btn btn-primary">Оставить отзыв</a>
+          <a href="{% url 'view-reviews' pk=hotel.id %}"><i class="fas fa-comments"></i>Отзывы</a>
         </div>
       </div>
     </div>

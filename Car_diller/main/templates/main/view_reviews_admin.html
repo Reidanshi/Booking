@@ -1,0 +1,18 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Admin Reviews{% endblock %}
+
+{% block content %}
+  <h2 class="text-white">Reviews for Hotels You Administer</h2>
+  {% for review in reviews %}
+    <div class="text-white">
+      <p>Hotel: {{ review.hotel.name }}</p>
+      <p>User Email: {{ review.user.email }}</p>
+      <p>Comment: {{ review.comment }}</p>
+      <p>Rating: {{ review.rating }}</p>
+      <p>Publication Date: {{ review.pub_date }}</p>
+      <a href="{% url 'update-reviews-admin' review_id=review.id %}" class="btn btn-primary">Редактировать отзыв</a>
+      <a href="{% url 'delete-reviews-admin' review_id=review.id %}" class="btn btn-danger">Удалить отзыв</a>
+    </div>
+  {% endfor %}
+{% endblock %}

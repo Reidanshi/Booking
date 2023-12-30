@@ -1,9 +1,0 @@
-<h1>Список бронирований</h1>
-<ul>
-  {% for booking in bookings %}
-    <li>{{ booking.user.username }}: {{ booking.room.room_type }} ({{ booking.check_in_date }} - {{ booking.check_out_date }})
-      <a href="{% url 'cancel-booking' pk=booking.pk %}">Отменить</a>
-      <a href="{% url 'edit-booking' pk=booking.pk %}">Редактировать</a>
-    </li>
-  {% endfor %}
-</ul>

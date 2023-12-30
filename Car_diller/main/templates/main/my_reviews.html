@@ -1,14 +1,15 @@
 {% extends 'main/layout.html' %}
 
-{% block title %}Public Reviews{% endblock %}
+{% block title %}My Reviews{% endblock %}
 
 {% block content %}
-  <h2 class="text-white">Public Reviews for {{ hotel.name }}</h2>
-  {% for review in public_reviews %}
+  <h2 class="text-white">My Reviews</h2>
+  {% for review in user_reviews %}
     <div class="text-white">
-      <p>User Email: {{ review.user.email }}</p>
+      <p>Hotel: {{ review.hotel.name }}</p>
       <p>Comment: {{ review.comment }}</p>
       <p>Rating: {{ review.rating }}</p>
+      <p>User Email: {{ review.user.email }}</p>
       <p>Publication Date: {{ review.pub_date }}</p>
     </div>
   {% endfor %}

@@ -1,0 +1,25 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Комната: {{ room.number_room }} {{ room.room_type }} в отеле {{ room.hotel.name }}{% endblock %}
+
+{% block content %}
+  <div class="hotel-details">
+    <h2>Информация о комнате</h2>
+    {% if user_hotel %}
+      <ul>
+        <li><strong>Комната №:</strong> {{ room.number_room }}</li>
+        <li><strong>Фотографии:</strong> <img src="{{ room.photos.url }}" alt="Фото комнаты"></li>
+        <li><strong>Тип комнаты:</strong> {{ room.room_type }}</li>
+        <li><strong>Описание:</strong> {{ room.description }}</li>
+        <li><strong>Количество кроватей:</strong> {{ room.beds_counter }}</li>
+        <li><strong>Этаж:</strong> {{ room.level }}</li>
+        <li><strong>Цена за ночь:</strong> {{ room.price_per_night }}</li>
+      </ul>
+
+      <div class="buttons">
+        <a href="{% url 'edit-room' pk=room.pk %}" class="btn btn-primary">Редактировать</a>
+        <a href="{% url 'delete-room' pk=room.pk %}" class="btn btn-danger">Удалить</a>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

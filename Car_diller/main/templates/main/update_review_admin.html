@@ -4,7 +4,7 @@
 
 {% block content %}
   <h2 class="text-white">Редактировать отзыв</h2>
-  <form method="post" action="{% url 'update-reviews' review_id=review.id %}" class="text-white">
+  <form method="post" action="{% url 'update-reviews-admin' review.id %}" class="text-white">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Сохранить</button>

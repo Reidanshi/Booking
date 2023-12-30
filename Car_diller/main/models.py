@@ -116,6 +116,12 @@ class Room(models.Model):
 
 
 class Booking(models.Model):
+    STATUS_CHOICES = [
+        ('on_review', 'На рассмотрении'),
+        ('approved', 'Одобрено'),
+        ('rejected', 'Отклонено'),
+    ]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     check_in_date = models.DateField()
@@ -124,6 +130,7 @@ class Booking(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
     deleted = models.BooleanField(default=False)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='on_review')
 
     def __str__(self):
         return f"{self.user.username} - {self.room.room_type} - {self.check_in_date} to {self.check_out_date}"

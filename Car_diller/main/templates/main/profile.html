@@ -12,6 +12,8 @@
       <div class="user-details">
         <p>Добро пожаловать, {{ user.username }}!</p>
         <p>Email: {{ user.email }}</p>
+        <a href="{% url 'my-reviews' %}"><li><i class="fas fa-comments"></i>Мои отзывы</li></a>
+        <a href="{% url 'manage-bookings' %}"><li><i class="fas fa-pen"></i>Управление бронированиями</li></a>
         <a href="{% url 'logout' %}"><li><i class="fas fa-times-circle"></i>Выйти</li></a>
       </div>
     </div>

@@ -5,30 +5,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 
 
-class HotelForm(ModelForm):
-    class Meta:
-        model = Hotel
-        fields = ['name', 'location', 'description', 'rating']
-
-        widgets = {
-            "name": TextInput(attrs={
-                'class': "form-control",
-                'placeholder': 'Название отеля'
-            }),
-            "location": TextInput(attrs={
-                'class': "form-control",
-                'placeholder': 'Локация'
-            }),
-            "description": Textarea(attrs={
-                'class': "form-control",
-                'placeholder': 'Описание отеля'
-            }),
-            "rating": NumberInput(attrs={
-                'class': "form-control",
-                'placeholder': 'Рейтинг'
-            })
-        }
-
 class HotelRegistrationForm(forms.ModelForm):
     class Meta:
         model = Hotel
@@ -46,17 +22,29 @@ class AddRoomForm(forms.ModelForm):
         model = Room
         fields = ['room_type', 'description', 'beds_counter', 'number_room', 'level', 'photos', 'price_per_night']
 
-class ManageBookingsForm(forms.Form):
-    hotel = forms.ModelChoiceField(queryset=None)
-    room = forms.ModelChoiceField(queryset=None)
-    booking = forms.ModelChoiceField(queryset=None)
+class RoomUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Room
+        fields = ['room_type', 'description', 'beds_counter', 'number_room', 'level', 'photos', 'price_per_night']
+
+class ManageAdminBookingsForm(forms.Form):
+    hotel = forms.ModelChoiceField(queryset=Hotel.objects.all())
+    room = forms.ModelChoiceField(queryset=Room.objects.all())
+    booking = forms.ModelChoiceField(queryset=Booking.objects.all())
     action = forms.ChoiceField(choices=[('approve', 'Одобрить'), ('reject', 'Отклонить')])
+
+    def __init__(self, *args, hotels=None, rooms=None, **kwargs):
+        super(ManageAdminBookingsForm, self).__init__(*args, **kwargs)
+        if hotels is not None:
+            self.fields['hotel'].queryset = hotels
+        if rooms is not None:
+            self.fields['room'].queryset = rooms
 
 
 class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking
-        fields = ['check_in_date', 'check_out_date']
+        fields = ['check_in_date', 'check_out_date', 'status']
 
         widgets = {
             'check_in_date': forms.DateInput(attrs={'type': 'date'}),
@@ -109,8 +97,5 @@ class ReviewForm(forms.ModelForm):
         model = Review
         fields = ['comment', 'rating']
 
-# class BookingForm(forms.ModelForm):
-#     class Meta:
-#         model = Booking
-#         fields = ['user', 'room', 'check_in_date', 'check_out_date']
+
 

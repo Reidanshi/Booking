@@ -1,17 +1,12 @@
 from django.views.generic import DetailView, ListView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Hotel, Room, Booking, Review
 from .forms import BookingForm, RegistrationForm, ManageBookingsForm, ReviewForm, CustomUserCreationForm
-from .forms import HotelRegistrationForm, HotelUpdateForm, AddRoomForm
+from .forms import HotelRegistrationForm, HotelUpdateForm, AddRoomForm, RoomUpdateForm, ManageAdminBookingsForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import LoginView
-from django.urls import reverse_lazy
-from datetime import date
-from django.db.models import Q
 from django.http import HttpResponseForbidden
-from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 
 
@@ -33,81 +28,6 @@ def hotel_detail(request, pk):
     reviews = Review.objects.filter(hotel=hotel)
     context = {'hotel': hotel, 'reviews': reviews}
     return render(request, 'main/hotel_detail.html', context)
-
-@login_required
-def custom_logout(request):
-    logout(request)
-    return redirect('home')
-
-
-class CustomLoginView(LoginView):
-    template_name = 'main/login.html'
-
-
-
-def register_admin(request):
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST, request.FILES)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.is_staff = True  # Делаем пользователя администратором
-            user.save()
-            login(request, user)
-            return redirect('home')
-    else:
-        form = CustomUserCreationForm()
-
-    return render(request, 'main/register_admin.html', {'form': form})
-
-
-@login_required
-def hotel_reviews(request, pk):
-    hotel = get_object_or_404(Hotel, pk=pk)
-    reviews = Review.objects.filter(hotel=hotel)
-    form = ReviewForm()
-
-    if request.method == 'POST':
-        form = ReviewForm(request.POST)
-        if form.is_valid():
-            review = form.save(commit=False)
-            review.hotel = hotel
-            review.user = request.user
-            review.save()
-            return redirect('hotel-reviews', pk=pk)
-
-    context = {
-        'hotel': hotel,
-        'reviews': reviews,
-        'form': form,
-    }
-
-    return render(request, 'main/hotel_reviews.html', context)
-
-@login_required
-def update_review(request, pk):
-    review = get_object_or_404(Review, pk=pk)
-
-    if request.method == 'POST':
-        form = ReviewForm(request.POST, instance=review)
-        if form.is_valid():
-            form.save()
-            return redirect('hotel-reviews', pk=review.hotel.pk)
-    else:
-        form = ReviewForm(instance=review)
-
-    context = {
-        'form': form,
-        'review': review,
-    }
-
-    return render(request, 'main/update_review.html', context)
-
-@login_required
-def delete_review(request, pk):
-    review = get_object_or_404(Review, pk=pk)
-    hotel_pk = review.hotel.pk
-    review.delete()
-    return redirect('hotel-reviews', pk=hotel_pk)
 
 
 def room_list(request, hotel_id):
@@ -131,76 +51,75 @@ class RoomDetailView(DetailView):
         context['user'] = self.request.user
         return context
 
-class RoomListView(DetailView):
+class RoomListView(ListView):
     model = Room
     template_name = 'main/room_list.html'
+    context_object_name = 'rooms'
+
+    def get_queryset(self):
+        hotel_id = self.kwargs['pk']
+        hotel = Hotel.objects.get(pk=hotel_id)
+        return Room.objects.filter(hotel=hotel, available=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         hotel_id = self.kwargs['pk']
-        context['rooms'] = Room.objects.filter(hotel_id=hotel_id)
-        context['hotel'] = Hotel.objects.get(id=hotel_id)
+        context['hotel'] = Hotel.objects.get(pk=hotel_id)
         return context
 
 
+def register(request):
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('profile')
+    else:
+        form = RegistrationForm()
+
+    return render(request, 'main/register.html', {'form': form})
 
 @login_required
-def book_room(request, pk, room_id):
-    room = get_object_or_404(Room, pk=room_id)
+def profile(request):
+    return render(request, 'main/profile.html')
 
+
+def custom_login(request):
     if request.method == 'POST':
-        form = BookingForm(request.POST)
-        if form.is_valid():
-            booking = form.save(commit=False)
-            booking.user = request.user
-            booking.room = room
-            booking.save()
-
-            room.available = False
-            room.save()
-
-            return redirect('manage-bookings')
-
-    else:
-        form = BookingForm()
-
-    context = {
-        'room': room,
-        'form': form,
-    }
-
-    return render(request, 'main/book_room.html', context)
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+    return render(request, 'main/login.html')
 
 
-def cancel_booking(request, booking_id):
-    booking = get_object_or_404(Booking, pk=booking_id)
-
-    room = booking.room
-    room.is_booked = False
-    room.save()
-
-    booking.delete()
-
-    return redirect('manage-bookings')
+@login_required
+def custom_logout(request):
+    logout(request)
+    return redirect('home')
 
 
-def manage_bookings(request, hotel_id=None, room_id=None):
-    hotels = Hotel.objects.all()
-    rooms = Room.objects.all()
-    bookings = Booking.objects.all()
+class CustomLoginView(LoginView):
+    template_name = 'main/login.html'
 
+
+
+def register_admin(request):
     if request.method == 'POST':
-        form = ManageBookingsForm(request.POST, hotels=hotels, rooms=rooms)
+        form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
-            selected_hotel_id = form.cleaned_data['hotel']
-            selected_room_id = form.cleaned_data['room']
-
-            return redirect('manage-bookings', hotel_id=selected_hotel_id, room_id=selected_room_id)
+            user = form.save(commit=False)
+            user.is_staff = True
+            user.save()
+            login(request, user)
+            return redirect('home')
     else:
-        form = ManageBookingsForm(hotels=hotels, rooms=rooms)
+        form = CustomUserCreationForm()
 
-    context = {'form': form, 'hotel_id': hotel_id, 'room_id': room_id}
-    return render(request, 'main/manage_bookings.html', {'bookings': bookings})
+    return render(request, 'main/register_admin.html', {'form': form})
 
 
 @login_required
@@ -228,6 +147,7 @@ def my_hotel(request):
 
 @login_required
 def view_reviews_admin(request):
+
     return render(request, 'main/view_reviews_admin.html')
 
 @login_required
@@ -283,29 +203,111 @@ def add_room(request, pk):
             room = form.save(commit=False)
             room.hotel = hotel
             room.save()
-            hotel.room.add(room)
-            messages.success(request, 'Комната успешно зарегистрирована!')
             return redirect('manage-rooms', pk=pk)
-        else:
-            messages.error(request, 'Пожалуйста, исправьте ошибки в форме.')
     else:
         form = AddRoomForm()
 
     return render(request, 'main/add_room.html', {'form': form, 'hotel': hotel})
 
+@login_required
+def delete_room(request, pk):
+    room = get_object_or_404(Room, pk=pk)
+
+    if request.method == 'POST':
+        room.delete()
+        return redirect('manage-rooms', pk=room.hotel.pk)
+
+    return render(request, 'main/delete_room.html', {'room': room})
+
+@login_required
+def edit_room(request, pk):
+    room = get_object_or_404(Room, pk=pk)
+
+    if request.method == 'POST':
+        form = RoomUpdateForm(request.POST, instance=room)
+        if form.is_valid():
+            form.save()
+            return redirect('info-room', pk=pk)
+    else:
+        form = RoomUpdateForm(instance=room)
+
+    return render(request, 'main/edit_room.html', {'form': form, 'room': room})
+
+@login_required
+def info_room(request, pk):
+    room = get_object_or_404(Room, pk=pk)
+    return render(request, 'main/info_room.html', {'room': room, 'user_hotel': room.hotel})
+
+
+@login_required
+def book_room(request, pk, room_id):
+    room = get_object_or_404(Room, pk=room_id)
+
+    if request.method == 'POST':
+        form = BookingForm(request.POST)
+        if form.is_valid():
+            booking = form.save(commit=False)
+            booking.user = request.user
+            booking.room = room
+            booking.save()
+
+            room.available = False
+            room.save()
+
+            return redirect('manage-bookings')
+
+    else:
+        form = BookingForm()
+
+    context = {
+        'room': room,
+        'form': form,
+    }
+
+    return render(request, 'main/book_room.html', context)
+
+
+@login_required
+def cancel_booking(request, booking_id):
+    booking = get_object_or_404(Booking, pk=booking_id)
+
+    room = booking.room
+    room.available = True  # Пометить комнату как доступную
+    room.save()
+
+    booking.delete()
+
+    return redirect('manage-bookings')
 
 
 @login_required
 def manage_bookings(request, hotel_id=None, room_id=None):
-    hotels = Hotel.objects.get_for_admin(request.user)
-    if not hotels.exists():
-        return HttpResponseForbidden("У вас нет прав для управления бронированиями отелей.")
+    hotels = Hotel.objects.all()
+    rooms = Room.objects.all()
+    user_bookings = Booking.objects.filter(user=request.user)
 
+    if request.method == 'POST':
+        form = ManageBookingsForm(request.POST, hotels=hotels, rooms=rooms)
+        if form.is_valid():
+            selected_hotel_id = form.cleaned_data['hotel']
+            selected_room_id = form.cleaned_data['room']
+
+            return redirect('manage-bookings', hotel_id=selected_hotel_id, room_id=selected_room_id)
+    else:
+        form = ManageBookingsForm(hotels=hotels, rooms=rooms)
+
+    context = {'user_bookings': user_bookings, 'form': form}
+    return render(request, 'main/manage_bookings.html', context)
+
+
+@login_required
+def manage_bookings_admin(request, hotel_id=None, room_id=None):
+    hotels = Hotel.objects.filter(admin=request.user)
     rooms = Room.objects.filter(hotel__admin=request.user)
     bookings = Booking.objects.filter(room__in=rooms)
 
     if request.method == 'POST':
-        form = ManageBookingsForm(request.POST, hotels=hotels, rooms=rooms)
+        form = ManageAdminBookingsForm(request.POST, hotels=hotels, rooms=rooms)
         if form.is_valid():
             selected_hotel_id = form.cleaned_data['hotel']
             selected_room_id = form.cleaned_data['room']
@@ -320,19 +322,33 @@ def manage_bookings(request, hotel_id=None, room_id=None):
                 booking.status = 'rejected'
                 booking.save()
 
-            return redirect('manage-bookings', hotel_id=selected_hotel_id, room_id=selected_room_id)
+            return redirect('manage-bookings-admin', hotel_id=selected_hotel_id, room_id=selected_room_id)
     else:
-        form = ManageBookingsForm(hotels=hotels, rooms=rooms)
+        form = ManageAdminBookingsForm(request.POST, hotels=hotels, rooms=rooms)
 
-    context = {'form': form, 'hotel_id': hotel_id, 'room_id': room_id}
-    return render(request, 'main/manage_bookings.html', {'bookings': bookings, 'form': form})
-
-@user_passes_test(lambda u: u.is_staff)
-def manage_bookings_admin(request, hotel_id=None, room_id=None):
-    bookings = Booking.objects.all()
-
-    context = {'bookings': bookings}
+    context = {'form': form, 'hotel_id': hotel_id, 'room_id': room_id, 'bookings': bookings}
     return render(request, 'main/manage_bookings_admin.html', context)
+
+
+@login_required
+def approve_booking(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
+
+    booking.status = 'approved'
+    booking.save()
+
+    return redirect('manage-bookings')
+
+
+@login_required
+def reject_booking(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
+
+    booking.status = 'rejected'
+    booking.save()
+
+    return redirect('manage-bookings')
+
 
 @login_required
 def add_review(request, hotel_id):
@@ -351,119 +367,93 @@ def add_review(request, hotel_id):
 
     return render(request, 'main/add_review.html', {'form': form, 'hotel': hotel})
 
+@login_required
+def my_reviews(request):
+    user_reviews = Review.objects.filter(user=request.user, deleted=False)
+
+    context = {'user_reviews': user_reviews}
+    return render(request, 'main/my_reviews.html', context)
 
 
 def view_reviews(request, pk):
-    user_reviews = Review.objects.filter(user=request.user)
-    return render(request, 'main/view_reviews.html', {'user_reviews': user_reviews})
+    hotel = get_object_or_404(Hotel, pk=pk)
+    public_reviews = Review.objects.filter(hotel=hotel, deleted=False)
 
-def register(request):
-    if request.method == 'POST':
-        form = RegistrationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('profile')
-    else:
-        form = RegistrationForm()
+    context = {'public_reviews': public_reviews, 'hotel': hotel}
+    return render(request, 'main/view_reviews.html', context)
 
-    return render(request, 'main/register.html', {'form': form})
 
 @login_required
-def profile(request):
-    return render(request, 'main/profile.html')
+def view_reviews_admin(request):
+    user = request.user
+    hotels_admin = Hotel.objects.filter(admin=user)
+    reviews = Review.objects.filter(hotel__in=hotels_admin)
+
+    context = {'reviews': reviews}
+    return render(request, 'main/view_reviews_admin.html', context)
 
 
-def custom_login(request):
+@login_required
+def update_reviews(request, review_id):
+    review = get_object_or_404(Review, id=review_id, user=request.user)
+
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('home')
-    return render(request, 'main/login.html')
-
-
-
-
-class HotelCreateView(CreateView):
-    model = Hotel
-    template_name = 'hotel_form.html'
-    fields = ['name', 'description', 'location', 'photos']
-
-
-class HotelUpdateView(UpdateView):
-    model = Hotel
-    template_name = 'hotel_form.html'
-    fields = ['name', 'description', 'location', 'photos']
-
-
-class HotelDeleteView(DeleteView):
-    model = Hotel
-    template_name = 'hotel_confirm_delete.html'
-    success_url = reverse_lazy('hotel-list')
-
-class HotelReviewsView(ListView):
-    model = Review
-    template_name = 'hotel_reviews.html'
-    context_object_name = 'reviews'
-
-    def get_queryset(self):
-        return Review.objects.filter(hotel_id=self.kwargs['pk'])
-
-class RoomCreateView(CreateView):
-    model = Room
-    template_name = 'room_form.html'
-    fields = ['room_type', 'description', 'beds_counter', 'number_room', 'level', 'photos', 'price_per_night', 'available']
-
-
-class RoomUpdateView(UpdateView):
-    model = Room
-    template_name = 'room_form.html'
-    fields = ['room_type', 'description', 'beds_counter', 'number_room', 'level', 'photos', 'price_per_night', 'available']
-
-
-class RoomDeleteView(DeleteView):
-    model = Room
-    template_name = 'room_confirm_delete.html'
-    success_url = reverse_lazy('hotel-list')
-
-class RoomAvailabilityView(UpdateView):
-    model = Room
-    template_name = 'room_availability.html'
-    fields = ['available']
-    success_url = reverse_lazy('hotel-list')
-
-class ReservationListView(ListView):
-    model = Booking
-    template_name = 'reservation_list.html'
-    context_object_name = 'reservations'
-
-    def get_queryset(self):
-        today = date.today()
-        return Booking.objects.filter(Q(check_out_date__gte=today) | Q(check_in_date__gte=today))
-
-def booking_list(request):
-    bookings = Booking.objects.all()  # предполагается, что у вас есть модель Booking
-    return render(request, 'main/booking_list.html', {'bookings': bookings})
-
-def booking_list(request):
-    bookings = Booking.objects.all()
-    return render(request, 'main/booking_list.html', {'bookings': bookings})
-
-def cancel_booking(request, pk):
-    booking = get_object_or_404(Booking, pk=pk)
-    booking.delete()
-    return redirect('booking-list')
-
-def edit_booking(request, pk):
-    booking = get_object_or_404(Booking, pk=pk)
-    if request.method == 'POST':
-        form = BookingForm(request.POST, instance=booking)
+        form = ReviewForm(request.POST, instance=review)
         if form.is_valid():
             form.save()
-            return redirect('booking-list')
+            return redirect('my-reviews')
     else:
-        form = BookingForm(instance=booking)
-    return render(request, 'main/edit_booking.html', {'form': form, 'booking': booking})
+        form = ReviewForm(instance=review)
+
+    context = {'form': form, 'review': review}
+    return render(request, 'main/update_review.html', context)
+
+
+@login_required
+def delete_reviews(request, review_id):
+    review = get_object_or_404(Review, id=review_id, user=request.user)
+
+    if request.method == 'POST':
+        if review.deleted:
+            review.deleted = False
+        else:
+            review.deleted = True
+
+        review.save()
+        return redirect('my-reviews')
+
+    context = {'review': review}
+    return render(request, 'main/delete_review.html', context)
+
+@login_required
+def update_reviews_admin(request, review_id):
+    review = get_object_or_404(Review, id=review_id, hotel__admin=request.user)
+
+    if request.method == 'POST':
+        form = ReviewForm(request.POST, instance=review)
+        if form.is_valid():
+            form.save()
+            return redirect('view-reviews-admin')
+    else:
+        form = ReviewForm(instance=review)
+
+    context = {'form': form, 'review': review}
+    return render(request, 'main/update_review_admin.html', context)
+
+
+@login_required
+def delete_reviews_admin(request, review_id):
+    review = get_object_or_404(Review, id=review_id, hotel__admin=request.user)
+
+    if request.method == 'POST':
+        if review.deleted:
+            review.deleted = False
+        else:
+            review.deleted = True
+
+        review.save()
+        return redirect('view-reviews-admin')
+
+    context = {'review': review}
+    return render(request, 'main/delete-reviews-admin.html', context)
+
