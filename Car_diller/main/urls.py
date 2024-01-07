@@ -7,6 +7,7 @@ from .views import CustomLoginView, custom_logout, hotel_detail, add_review, upd
 from .views import delete_hotel, manage_rooms, delete_room, update_reviews, delete_reviews, my_reviews, delete_reviews_admin
 from .views import manage_bookings_admin, view_reviews_admin, my_hotel, register_hotel, info_room, update_reviews_admin
 
+
 urlpatterns = [
     path('', views.home, name='home'),
     path('hotels/', views.hotels, name='hotels'),

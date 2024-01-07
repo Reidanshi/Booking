@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    command: gunicorn Diplom_booking_hotel.wsgi:application -b 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
