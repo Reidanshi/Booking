@@ -32,8 +32,6 @@
                     <a href="{% url 'view-reviews-admin' %}"><li><i class="fas fa-comments"></i>Отзывы</li></a>
                 {% else %}
                     <a href="{% url 'profile' %}"><li><i class="far fa-id-card"></i>Профиль</li></a>
-<!--                    <a href="{% url 'manage-bookings' %}"><li><i class="fas fa-pen"></i>Управление бронированиями</li></a>-->
-<!--                    <a href="{% url 'view-reviews' pk=request.user.pk %}"><li><i class="fas fa-comments"></i>Отзывы</li></a>-->
                 {% endif %}
             <a href="{% url 'logout' %}"><li><i class="fas fa-times-circle"></i>Выйти</li></a>
             {% else %}

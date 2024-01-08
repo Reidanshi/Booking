@@ -10,6 +10,7 @@ from .views import manage_bookings_admin, view_reviews_admin, my_hotel, register
 
 urlpatterns = [
     path('', views.home, name='home'),
+    # path('api/', include('your_app.api_urls')),
     path('hotels/', views.hotels, name='hotels'),
     path('hotels/<int:pk>/', hotel_detail, name='hotel-detail'),
     path('hotels/<int:pk>/rooms/', views.RoomListView.as_view(), name='room-list'),
