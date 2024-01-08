@@ -11,6 +11,11 @@ from django.contrib import messages
 
 
 def home(request):
+    """
+    Renders the home
+    :param request: Django Request object
+    :return: rendered home page
+    """
     context = {
         'title': 'Roch Hotels Official Site',
         'user': request.user
@@ -19,11 +24,21 @@ def home(request):
 
 
 def hotels(request):
+    """
+    Renders the hotels page
+    :param request: Django Request object
+    :return: rendered hotels page
+    """
     hotels = Hotel.objects.all()
     return render(request, 'main/hotels.html', {'hotels':hotels})
 
 
 def hotel_detail(request, pk):
+    """
+    Renders the hotel detail page
+    :param request: Django Request object
+    :return: rendered hotel
+    """
     hotel = get_object_or_404(Hotel, pk=pk)
     reviews = Review.objects.filter(hotel=hotel)
     context = {'hotel': hotel, 'reviews': reviews}
@@ -31,37 +46,66 @@ def hotel_detail(request, pk):
 
 
 def room_list(request, hotel_id):
+    """
+    Renders the room list page
+    :param request: Django Request object
+    :return: rendered room
+    """
     hotel = Hotel.objects.get(pk=hotel_id)
     rooms = Room.objects.filter(hotel=hotel, available=True)
     return render(request, 'main/room_list.html', {'hotel': hotel, 'rooms': rooms})
 
 
 class RoomDetailView(DetailView):
+    """
+    Renders the room detail page
+    """
     model = Room
     template_name = 'main/rooms_detail_view.html'
     context_object_name = 'room'
 
     def get_object(self, queryset=None):
+        """
+        Renders the room detail page
+        :param queryset: Django QuerySet
+        :return: rendered room
+        """
         hotel_id = self.kwargs['pk']
         room_id = self.kwargs['room_id']
         return Room.objects.get(hotel_id=hotel_id, id=room_id)
 
     def get_context_data(self, **kwargs):
+        """
+        Renders the context data
+        :param kwargs: Keyword arguments
+        :return: rendered context
+        """
         context = super().get_context_data(**kwargs)
         context['user'] = self.request.user
         return context
 
 class RoomListView(ListView):
+    """
+    Renders the rooms list
+    """
     model = Room
     template_name = 'main/room_list.html'
     context_object_name = 'rooms'
 
     def get_queryset(self):
+        """
+        Renders the rooms list
+        :return: rendered room
+        """
         hotel_id = self.kwargs['pk']
         hotel = Hotel.objects.get(pk=hotel_id)
         return Room.objects.filter(hotel=hotel, available=True)
 
     def get_context_data(self, **kwargs):
+        """
+        Renders the context data
+        :param kwargs: Keyword args
+        """
         context = super().get_context_data(**kwargs)
         hotel_id = self.kwargs['pk']
         context['hotel'] = Hotel.objects.get(pk=hotel_id)
@@ -69,6 +113,10 @@ class RoomListView(ListView):
 
 
 def register(request):
+    """
+    Renders the registration page
+    :return: rendered registration page
+    """
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
@@ -82,10 +130,19 @@ def register(request):
 
 @login_required
 def profile(request):
+    """
+    Renders the profile page
+    :param request: request object
+    """
     return render(request, 'main/profile.html')
 
 
 def custom_login(request):
+    """
+    Renders the profile page
+    :param request: request object
+    :return: rendered profile page
+    """
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -98,16 +155,27 @@ def custom_login(request):
 
 @login_required
 def custom_logout(request):
+    """
+    Renders the profile page
+    :param request: request object
+    :return: rendered profile page
+    """
     logout(request)
     return redirect('home')
 
 
 class CustomLoginView(LoginView):
+    """
+    Renders the profile page
+    """
     template_name = 'main/login.html'
 
-
-
 def register_admin(request):
+    """
+    Renders the profile page
+    :param request: request object
+    :return: rendered profile page
+    """
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
@@ -124,6 +192,11 @@ def register_admin(request):
 
 @login_required
 def register_hotel(request):
+    """
+    Renders the profile page
+    :param request: request object
+    :return: rendered hotel
+    """
     if request.method == 'POST':
         form = HotelRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
@@ -142,16 +215,30 @@ def register_hotel(request):
 
 @login_required
 def my_hotel(request):
+    """
+    Renders the profile page
+    :param request: request object
+    :return: rendered hotel
+    """
     user_hotel = Hotel.objects.filter(admin=request.user).first()
     return render(request, 'main/my_hotel.html', {'user_hotel': user_hotel})
 
 @login_required
 def view_reviews_admin(request):
-
+    """
+    Renders the profile page
+    :param request: request object
+    :return: rendered hotel
+    """
     return render(request, 'main/view_reviews_admin.html')
 
 @login_required
 def update_hotel(request, pk):
+    """
+    Updates the profile page
+    :param request: request object
+    :return: rendered hotel
+    """
     hotel = get_object_or_404(Hotel, pk=pk)
 
     if hotel.admin != request.user:
@@ -169,6 +256,11 @@ def update_hotel(request, pk):
 
 @login_required
 def delete_hotel(request, pk):
+    """
+    Deletes the profile page
+    :param request: request object
+    :return: rendered hotel
+    """
     hotel = get_object_or_404(Hotel, pk=pk)
 
     if hotel.admin != request.user:
@@ -183,6 +275,12 @@ def delete_hotel(request, pk):
 
 @login_required
 def manage_rooms(request, pk):
+    """
+    Manages the rooms page
+    :param request: request object
+    :param pk: pk of the room
+    :return: rendered rooms
+    """
     hotel = get_object_or_404(Hotel, pk=pk)
 
     if hotel.admin != request.user:
@@ -195,6 +293,12 @@ def manage_rooms(request, pk):
 
 @login_required
 def add_room(request, pk):
+    """
+    Adds a room
+    :param request: request object
+    :param pk: pk of the room
+    :return: rendered rooms
+    """
     hotel = get_object_or_404(Hotel, pk=pk)
 
     if request.method == 'POST':
@@ -211,6 +315,12 @@ def add_room(request, pk):
 
 @login_required
 def delete_room(request, pk):
+    """
+    Deletes a room
+    :param request: request object
+    :param pk: pk of the room
+    :return: rendered rooms
+    """
     room = get_object_or_404(Room, pk=pk)
 
     if request.method == 'POST':
@@ -221,6 +331,12 @@ def delete_room(request, pk):
 
 @login_required
 def edit_room(request, pk):
+    """
+    Edits a room
+    :param request: request object
+    :param pk: pk of the room
+    :return: rendered rooms
+    """
     room = get_object_or_404(Room, pk=pk)
 
     if request.method == 'POST':
@@ -235,12 +351,25 @@ def edit_room(request, pk):
 
 @login_required
 def info_room(request, pk):
+    """
+    Shows info about a room
+    :param request: request object
+    :param pk: pk of the room
+    :return: rendered rooms
+    """
     room = get_object_or_404(Room, pk=pk)
     return render(request, 'main/info_room.html', {'room': room, 'user_hotel': room.hotel})
 
 
 @login_required
 def book_room(request, pk, room_id):
+    """
+    Shows info about a
+    :param request: request object
+    :param pk: pk of the room
+    :param room_id: pk of the room
+    :return: rendered rooms
+    """
     room = get_object_or_404(Room, pk=room_id)
 
     if request.method == 'POST':
@@ -269,6 +398,12 @@ def book_room(request, pk, room_id):
 
 @login_required
 def cancel_booking(request, booking_id):
+    """
+    Cancels a booking
+    :param request: request object
+    :param booking_id: pk of the booking
+    :return: rendered booking
+    """
     booking = get_object_or_404(Booking, pk=booking_id)
 
     room = booking.room
@@ -282,6 +417,13 @@ def cancel_booking(request, booking_id):
 
 @login_required
 def manage_bookings(request, hotel_id=None, room_id=None):
+    """
+    Manage bookings
+    :param request: request object
+    :param hotel_id: pk of the hotel
+    :param room_id: pk of the room
+    :return: rendered bookings
+    """
     hotels = Hotel.objects.all()
     rooms = Room.objects.all()
     user_bookings = Booking.objects.filter(user=request.user)
@@ -302,6 +444,10 @@ def manage_bookings(request, hotel_id=None, room_id=None):
 
 @login_required
 def manage_bookings_admin(request, hotel_id=None, room_id=None):
+    """
+    :param request: Django request
+    :return: rendered bookings
+    """
     hotels = Hotel.objects.filter(admin=request.user)
     rooms = Room.objects.filter(hotel__admin=request.user)
     bookings = Booking.objects.filter(room__in=rooms)
@@ -332,6 +478,12 @@ def manage_bookings_admin(request, hotel_id=None, room_id=None):
 
 @login_required
 def approve_booking(request, booking_id):
+    """
+    Approve a booking
+    :param request: Django Request object
+    :param booking_id: Booking ID
+    :return: Django Response object
+    """
     booking = get_object_or_404(Booking, id=booking_id)
 
     booking.status = 'approved'
@@ -352,6 +504,12 @@ def reject_booking(request, booking_id):
 
 @login_required
 def add_review(request, hotel_id):
+    """
+    Add a review to the
+    :param request: Django Request object
+    :param hotel_id: Hotel ID to
+    :return: Django Response object
+    """
     hotel = get_object_or_404(Hotel, pk=hotel_id)
 
     if request.method == 'POST':
@@ -369,6 +527,11 @@ def add_review(request, hotel_id):
 
 @login_required
 def my_reviews(request):
+    """
+    Display the
+    :param request: Django Request object
+    :return: Django Response object
+    """
     user_reviews = Review.objects.filter(user=request.user, deleted=False)
 
     context = {'user_reviews': user_reviews}
@@ -376,6 +539,12 @@ def my_reviews(request):
 
 
 def view_reviews(request, pk):
+    """
+    Display the
+    :param request: Django Request object
+    :param pk: Hotel ID to
+    :return: Django Response object
+    """
     hotel = get_object_or_404(Hotel, pk=pk)
     public_reviews = Review.objects.filter(hotel=hotel, deleted=False)
 
@@ -385,6 +554,11 @@ def view_reviews(request, pk):
 
 @login_required
 def view_reviews_admin(request):
+    """
+    Display the
+    :param request: Django Request
+    :return: Django Response object
+    """
     user = request.user
     hotels_admin = Hotel.objects.filter(admin=user)
     reviews = Review.objects.filter(hotel__in=hotels_admin)
@@ -395,6 +569,12 @@ def view_reviews_admin(request):
 
 @login_required
 def update_reviews(request, review_id):
+    """
+    Update the
+    :param request: Django Request object
+    :param review_id: Hotel ID to
+    :return: Django Response object
+    """
     review = get_object_or_404(Review, id=review_id, user=request.user)
 
     if request.method == 'POST':
@@ -411,6 +591,12 @@ def update_reviews(request, review_id):
 
 @login_required
 def delete_reviews(request, review_id):
+    """
+    Delete the
+    :param request: Django Request object
+    :param review_id: Hotel ID to
+    :return: Django Response object
+    """
     review = get_object_or_404(Review, id=review_id, user=request.user)
 
     if request.method == 'POST':
@@ -427,6 +613,12 @@ def delete_reviews(request, review_id):
 
 @login_required
 def update_reviews_admin(request, review_id):
+    """
+    Update the reviews
+    :param request: Django Request object
+    :param review_id: Hotel ID to
+    :return: Django Response object
+    """
     review = get_object_or_404(Review, id=review_id, hotel__admin=request.user)
 
     if request.method == 'POST':
@@ -443,6 +635,12 @@ def update_reviews_admin(request, review_id):
 
 @login_required
 def delete_reviews_admin(request, review_id):
+    """
+    Delete the reviews
+    :param request: Django Request
+    :param review_id: Hotel ID to
+    :return: Django Response object
+    """
     review = get_object_or_404(Review, id=review_id, hotel__admin=request.user)
 
     if request.method == 'POST':
